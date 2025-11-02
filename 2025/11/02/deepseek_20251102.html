@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深圳养老金精确测算工具</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            overflow: hidden;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eaeaea;
+            background: linear-gradient(135deg, #2c3e50, #4a6491);
+            color: white;
+            margin: -30px -30px 30px -30px;
+            padding: 30px;
+            border-radius: 15px 15px 0 0;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .data-management {
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border-left: 5px solid #4CAF50;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .data-management h3 {
+            margin-bottom: 15px;
+            color: #2e7d32;
+            display: flex;
+            align-items: center;
+            font-size: 1.3rem;
+        }
+        
+        .data-management h3::before {
+            content: "💾";
+            margin-right: 10px;
+            font-size: 1.5rem;
+        }
+        
+        .data-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .data-buttons button {
+            flex: 1;
+            min-width: 150px;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+        
+        .data-buttons button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .save-btn { 
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            color: white;
+        }
+        .load-btn { 
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+            color: white;
+        }
+        .export-btn { 
+            background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+            color: white;
+        }
+        .import-btn { 
+            background: linear-gradient(135deg, #607D8B, #455A64);
+            color: white;
+        }
+        
+        .file-input { display: none; }
+        
+        .input-help {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .section-help {
+            background: linear-gradient(135deg, #fff3cd, #ffecb3);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #ffc107;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+            padding: 25px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .control-group label {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+            font-size: 1.1rem;
+        }
+        
+        .control-group input, .control-group select {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        
+        .control-group input:focus, .control-group select:focus {
+            border-color: #4CAF50;
+            outline: none;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+        
+        .action-buttons button {
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .action-buttons button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        
+        .add-year-btn {
+            background: linear-gradient(135deg, #4CAF50, #388E3C);
+            color: white;
+        }
+        
+        .calculate-btn {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            color: white;
+        }
+        
+        .years-container {
+            margin-top: 30px;
+        }
+        
+        .year-section {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+        
+        .year-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+        
+        .year-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #e9ecef, #dee2e6);
+            padding: 15px 20px;
+            margin: -20px -20px 20px -20px;
+            border-radius: 10px 10px 0 0;
+            border-bottom: 2px solid #ced4da;
+        }
+        
+        .year-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .remove-year-btn {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .remove-year-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(244, 67, 54, 0.3);
+        }
+        
+        .year-controls {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .year-control-item {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        
+        .year-control-label {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-size: 1.1rem;
+        }
+        
+        .year-control-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+        
+        .year-control-input:focus {
+            border-color: #4CAF50;
+            outline: none;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+        }
+        
+        .months-container {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .month-item {
+            display: flex;
+            flex-direction: column;
+            padding: 12px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            min-width: 0;
+            transition: all 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .month-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-color: #4CAF50;
+        }
+        
+        .month-header {
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+            font-size: 0.95rem;
+            color: #2c3e50;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .month-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .month-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 0.9rem;
+            transition: border 0.3s;
+        }
+        
+        .month-input:focus {
+            border-color: #4CAF50;
+            outline: none;
+            box-shadow: 0 0 3px rgba(76, 175, 80, 0.3);
+        }
+        
+        .input-label {
+            font-size: 0.8rem;
+            color: #666;
+            text-align: center;
+            margin-bottom: 3px;
+            font-weight: 500;
+        }
+        
+        .auto-calc-btn {
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            margin-top: 8px;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        
+        .auto-calc-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(255, 152, 0, 0.3);
+        }
+        
+        .result {
+            margin-top: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #f9f9f9, #e8f4fd);
+            border-left: 5px solid #4CAF50;
+            border-radius: 10px;
+            display: none;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .result h3 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eaeaea;
+            font-size: 1.8rem;
+            text-align: center;
+        }
+        
+        .summary {
+            background: linear-gradient(135deg, #e8f4fd, #bbdefb);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .summary p {
+            margin: 12px 0;
+            font-size: 1.1rem;
+        }
+        
+        .pension-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+        }
+        
+        .pension-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+            border-top: 4px solid #4CAF50;
+        }
+        
+        .pension-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+        
+        .pension-item h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            text-align: center;
+        }
+        
+        .pension-amount {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #4CAF50;
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 1rem;
+            padding-top: 25px;
+            border-top: 2px solid #eaeaea;
+        }
+        
+        @media (max-width: 1400px) {
+            .months-container {
+                grid-template-columns: repeat(6, 1fr);
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .months-container {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .year-controls {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .data-buttons {
+                flex-direction: column;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .months-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .pension-breakdown {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .months-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            header {
+                padding: 20px 15px;
+                margin: -15px -15px 20px -15px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>深圳养老金精确测算工具</h1>
+            <p class="subtitle">基于月度缴费基数和个人缴费的精确养老金计算器（内置深圳数据）</p>
+        </header>
+        
+        <div class="data-management">
+            <h3>数据管理</h3>
+            <p>保存您的缴费数据，方便下次继续使用或在不同设备间迁移</p>
+            <div class="data-buttons">
+                <button class="save-btn" onclick="saveData()">💾 保存数据到本地</button>
+                <button class="load-btn" onclick="loadData()">📂 从本地加载数据</button>
+                <button class="export-btn" onclick="exportData()">📤 导出数据文件</button>
+                <button class="import-btn" onclick="document.getElementById('fileInput').click()">📥 导入数据文件</button>
+                <input type="file" id="fileInput" class="file-input" accept=".json" onchange="importData(event)">
+            </div>
+            <div class="input-help">数据将保存在浏览器的本地存储中，清除浏览器数据会丢失保存的信息</div>
+        </div>
+        
+        <div class="section-help">
+            <strong>使用说明：</strong>
+            <ul>
+                <li>设置起始年份和退休年龄（默认起始年份为1965年）</li>
+                <li>点击"添加新一年数据"添加年份</li>
+                <li>系统会自动填充深圳的社会平均工资和利率数据（2000-2024年）</li>
+                <li>为每一年输入每个月的缴费基数和个人缴费金额</li>
+                <li>点击"自动计算"按钮可根据缴费基数自动计算个人缴费（8%）</li>
+                <li>点击"精确计算养老金"获取结果</li>
+                <li>使用数据管理功能保存或加载您的缴费数据</li>
+            </ul>
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label for="startYear">起始年份:</label>
+                <input type="number" id="startYear" value="1965" min="1965" max="2050">
+            </div>
+            
+            <div class="control-group">
+                <label for="retirementAge">预计退休年龄:</label>
+                <select id="retirementAge">
+                    <option value="139">60岁</option>
+                    <option value="170">55岁</option>
+                    <option value="195">50岁</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <button class="add-year-btn" onclick="addYear()">添加新一年数据</button>
+            <button class="calculate-btn" onclick="calculateMonthlyPension()">精确计算养老金</button>
+        </div>
+
+        <div id="yearsContainer" class="years-container"></div>
+
+        <div id="result" class="result">
+            <h3>养老金测算结果</h3>
+            <div class="summary">
+                <p><strong>计发月数:</strong> <span id="totalMonths">0</span> 个月</p>
+                <p><strong>个人缴费总额:</strong> <span id="totalPersonalContribution">0</span> 元</p>
+                <p><strong>个人账户最终余额:</strong> <span id="finalBalance">0</span> 元</p>
+                <p><strong>利息收益:</strong> <span id="totalInterest">0</span> 元</p>
+                <p><strong>本人平均缴费指数:</strong> <span id="avgIndex">0</span></p>
+            </div>
+            
+            <div class="pension-breakdown">
+                <div class="pension-item">
+                    <h4>基础养老金</h4>
+                    <div class="pension-amount"><span id="basicPension">0</span> 元/月</div>
+                    <p>(退休时社平工资 + 本人指数化月平均缴费工资) ÷ 2 × 总缴费年限 × 1%</p>
+                </div>
+                
+                <div class="pension-item">
+                    <h4>个人账户养老金</h4>
+                    <div class="pension-amount"><span id="personalPension">0</span> 元/月</div>
+                    <p>个人账户总额 ÷ 计发月数</p>
+                </div>
+                
+                <div class="pension-item">
+                    <h4>总计每月养老金</h4>
+                    <div class="pension-amount"><span id="totalPension">0</span> 元/月</div>
+                    <p>基础养老金 + 个人账户养老金</p>
+                </div>
+            </div>
+            
+            <div class="input-help" style="margin-top: 20px;">
+                说明：此计算基于您输入的月度数据，并考虑了个人账户的按年复利累积，结果非常接近实际值。
+            </div>
+        </div>
+        
+        <footer>
+            <p>深圳养老金精确测算工具 &copy; 2023 | 数据仅供参考，实际金额以社保部门核算为准</p>
+        </footer>
+    </div>
+
+    <script>
+        let currentYears = [];
+        
+        // 深圳社会平均工资历史数据（2000-2024年）
+        const shenzhenAvgSalary = {
+            2000: 1920, 2001: 2162, 2002: 2353, 2003: 2551, 2004: 2661,
+            2005: 2706, 2006: 2928, 2007: 3226, 2008: 3620, 2009: 3906,
+            2010: 4206, 2011: 4633, 2012: 4918, 2013: 5218, 2014: 6054,
+            2015: 6753, 2016: 7480, 2017: 8348, 2018: 9309, 2019: 10646,
+            2020: 11620, 2021: 12964, 2022: 13730, 2023: 14553, 2024: 14755
+        };
+        
+        // 深圳养老保险个人账户历年利率（2000-2024年）
+        const shenzhenInterestRate = {
+            2000: 2.25, 2001: 2.25, 2002: 2.25, 2003: 2.25, 2004: 2.25,
+            2005: 2.25, 2006: 2.52, 2007: 3.21, 2008: 3.92, 2009: 2.25,
+            2010: 2.75, 2011: 3.50, 2012: 3.50, 2013: 3.50, 2014: 3.50,
+            2015: 3.50, 2016: 8.31, 2017: 7.12, 2018: 8.29, 2019: 7.61,
+            2020: 6.04, 2021: 6.69, 2022: 6.12, 2023: 5.94, 2024: 6.00
+        };
+        
+        // 数据管理功能
+        function saveData() {
+            const data = collectAllData();
+            localStorage.setItem('pensionCalculatorData', JSON.stringify(data));
+            alert('数据已保存到本地存储！');
+        }
+        
+        function loadData() {
+            const savedData = localStorage.getItem('pensionCalculatorData');
+            if (savedData) {
+                if (confirm('是否加载之前保存的数据？当前未保存的数据将会丢失。')) {
+                    const data = JSON.parse(savedData);
+                    restoreData(data);
+                    alert('数据加载成功！');
+                }
+            } else {
+                alert('没有找到保存的数据！');
+            }
+        }
+        
+        function exportData() {
+            const data = collectAllData();
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const url = URL.createObjectURL(dataBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `养老金数据_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert('数据已导出为JSON文件！');
+        }
+        
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (confirm('是否导入数据文件？当前未保存的数据将会丢失。')) {
+                        restoreData(data);
+                        alert('数据导入成功！');
+                    }
+                } catch (error) {
+                    alert('文件格式错误，请选择正确的JSON数据文件！');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = ''; // 重置文件输入
+        }
+        
+        function collectAllData() {
+            const data = {
+                startYear: document.getElementById('startYear').value,
+                retirementAge: document.getElementById('retirementAge').value,
+                years: []
+            };
+            
+            currentYears.forEach(year => {
+                const yearData = {
+                    year: year,
+                    avgSalary: document.getElementById(`avgSalary_${year}`).value,
+                    interestRate: document.getElementById(`interestRate_${year}`).value,
+                    months: []
+                };
+                
+                for (let month = 1; month <= 12; month++) {
+                    const salaryInput = document.getElementById(`salary_${year}_${month}`);
+                    const personalInput = document.getElementById(`personal_${year}_${month}`);
+                    
+                    if (salaryInput && personalInput) {
+                        yearData.months.push({
+                            month: month,
+                            salary: salaryInput.value,
+                            personal: personalInput.value
+                        });
+                    }
+                }
+                
+                data.years.push(yearData);
+            });
+            
+            return data;
+        }
+        
+        function restoreData(data) {
+            // 清除现有数据
+            document.getElementById('yearsContainer').innerHTML = '';
+            currentYears = [];
+            
+            // 恢复基本设置
+            document.getElementById('startYear').value = data.startYear || 1965;
+            document.getElementById('retirementAge').value = data.retirementAge || '139';
+            
+            // 恢复年份数据
+            if (data.years && data.years.length > 0) {
+                data.years.forEach(yearData => {
+                    addYear();
+                    const currentYear = currentYears[currentYears.length - 1];
+                    
+                    // 设置社会平均工资
+                    const avgSalaryInput = document.getElementById(`avgSalary_${currentYear}`);
+                    if (avgSalaryInput && yearData.avgSalary) {
+                        avgSalaryInput.value = yearData.avgSalary;
+                    }
+                    
+                    // 设置利率
+                    const interestRateInput = document.getElementById(`interestRate_${currentYear}`);
+                    if (interestRateInput && yearData.interestRate) {
+                        interestRateInput.value = yearData.interestRate;
+                    }
+                    
+                    // 设置月度数据
+                    if (yearData.months) {
+                        yearData.months.forEach(monthData => {
+                            const salaryInput = document.getElementById(`salary_${currentYear}_${monthData.month}`);
+                            const personalInput = document.getElementById(`personal_${currentYear}_${monthData.month}`);
+                            
+                            if (salaryInput && personalInput) {
+                                salaryInput.value = monthData.salary || '0';
+                                personalInput.value = monthData.personal || '0';
+                            }
+                        });
+                    }
+                });
+            }
+        }
+        
+        function addYear() {
+            const startYear = parseInt(document.getElementById('startYear').value);
+            const year = startYear + currentYears.length;
+            
+            // 获取深圳数据
+            const avgSalary = shenzhenAvgSalary[year] || 0;
+            const interestRate = shenzhenInterestRate[year] || 0;
+            
+            const yearSection = document.createElement('div');
+            yearSection.className = 'year-section';
+            yearSection.innerHTML = `
+                <div class="year-header">
+                    <div class="year-title">${year}年</div>
+                    <button class="remove-year-btn" onclick="this.parentElement.parentElement.remove(); updateYearSequence()">删除该年</button>
+                </div>
+                
+                <div class="year-controls">
+                    <div class="year-control-item">
+                        <div class="year-control-label">社会平均工资(元):</div>
+                        <input type="number" class="year-control-input" id="avgSalary_${year}" value="${avgSalary}" min="0" step="100">
+                        <div class="input-help">${year}年度深圳市在岗职工月平均工资</div>
+                    </div>
+                    
+                    <div class="year-control-item">
+                        <div class="year-control-label">本年度利率(%):</div>
+                        <input type="number" class="year-control-input" id="interestRate_${year}" value="${interestRate}" min="0" step="0.01">
+                        <div class="input-help">${year}年度深圳市养老保险个人账户利率</div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div style="font-weight: bold; margin-bottom: 10px;">${year}年各月缴费数据:</div>
+                    <div class="months-container" id="months_${year}">
+                        ${generateMonthInputs(year)}
+                    </div>
+                    <div class="input-help">请输入每个月的实际缴费基数和个人缴费金额</div>
+                </div>
+            `;
+            
+            document.getElementById('yearsContainer').appendChild(yearSection);
+            currentYears.push(year);
+            
+            // 为新增年份的所有月份添加自动计算事件
+            setTimeout(() => {
+                for (let month = 1; month <= 12; month++) {
+                    const baseInput = document.getElementById(`salary_${year}_${month}`);
+                    if (baseInput) {
+                        baseInput.addEventListener('input', function() {
+                            autoCalculatePersonalContribution(year, month);
+                        });
+                    }
+                }
+            }, 100);
+        }
+        
+        function autoCalculatePersonalContribution(year, month) {
+            const baseInput = document.getElementById(`salary_${year}_${month}`);
+            const personalInput = document.getElementById(`personal_${year}_${month}`);
+            
+            if (baseInput && personalInput) {
+                const baseSalary = parseFloat(baseInput.value) || 0;
+                // 自动计算个人缴费（基数的8%）
+                const personalContribution = baseSalary * 0.08;
+                personalInput.value = personalContribution.toFixed(2);
+            }
+        }
+        
+        function generateMonthInputs(year) {
+            const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+            let html = '';
+            
+            // 设置默认缴费基数（社平工资的80%）
+            const defaultSalary = Math.round((shenzhenAvgSalary[year] || 10000) * 0.8);
+            const defaultPersonal = (defaultSalary * 0.08).toFixed(2);
+            
+            months.forEach((month, index) => {
+                html += `
+                    <div class="month-item">
+                        <div class="month-header">${month}</div>
+                        <div class="month-input-group">
+                            <div class="input-label">缴费基数</div>
+                            <input type="number" class="month-input" id="salary_${year}_${index + 1}" placeholder="基数" value="${defaultSalary}" min="0" step="100">
+                            
+                            <div class="input-label">个人缴费</div>
+                            <input type="number" class="month-input" id="personal_${year}_${index + 1}" placeholder="个人缴费" value="${defaultPersonal}" min="0" step="0.01">
+                            
+                            <button class="auto-calc-btn" onclick="autoCalculatePersonalContribution(${year}, ${index + 1})">自动计算(8%)</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            return html;
+        }
+        
+        function updateYearSequence() {
+            // 重新计算当前显示的年份序列
+            currentYears = [];
+            const yearSections = document.querySelectorAll('.year-section');
+            yearSections.forEach(section => {
+                const yearText = section.querySelector('.year-title').textContent;
+                const year = parseInt(yearText);
+                currentYears.push(year);
+            });
+        }
+        
+        function calculateMonthlyPension() {
+            if (currentYears.length === 0) {
+                alert('请至少添加一年的数据！');
+                return;
+            }
+            
+            // 收集所有数据
+            const monthlyData = [];
+            let totalMonths = 0;
+            let totalIndex = 0;
+            let personalAccountBalance = 0;
+            let totalPersonalContribution = 0;
+            
+            // 按年份和月份处理数据
+            currentYears.forEach(year => {
+                const avgSalaryInput = document.getElementById(`avgSalary_${year}`);
+                const interestRateInput = document.getElementById(`interestRate_${year}`);
+                const avgSalary = parseFloat(avgSalaryInput.value) || 0;
+                const interestRate = parseFloat(interestRateInput.value) || 0;
+                
+                // 检查社会平均工资是否为0
+                if (avgSalary <= 0) {
+                    alert(`${year}年的社会平均工资不能为0，请填写正确的数值！`);
+                    avgSalaryInput.focus();
+                    return;
+                }
+                
+                let yearPersonalContribution = 0;
+                
+                for (let month = 1; month <= 12; month++) {
+                    const salaryInput = document.getElementById(`salary_${year}_${month}`);
+                    const personalInput = document.getElementById(`personal_${year}_${month}`);
+                    
+                    if (salaryInput && personalInput) {
+                        const monthSalary = parseFloat(salaryInput.value) || 0;
+                        const personalContribution = parseFloat(personalInput.value) || 0;
+                        
+                        if (monthSalary > 0) {
+                            // 计算当月缴费指数（避免除以0）
+                            const monthIndex = monthSalary / avgSalary;
+                            totalIndex += monthIndex;
+                            totalMonths++;
+                            totalPersonalContribution += personalContribution;
+                            yearPersonalContribution += personalContribution;
+                            
+                            monthlyData.push({
+                                year,
+                                month,
+                                salary: monthSalary,
+                                personalContribution: personalContribution,
+                                avgSalary,
+                                index: monthIndex
+                            });
+                        }
+                    }
+                }
+                
+                // 按年复利计算个人账户
+                if (yearPersonalContribution > 0) {
+                    personalAccountBalance = personalAccountBalance * (1 + interestRate / 100) + yearPersonalContribution;
+                }
+            });
+            
+            if (totalMonths === 0) {
+                alert('没有有效的缴费数据！');
+                return;
+            }
+            
+            // 计算养老金
+            const avgIndex = totalIndex / totalMonths;
+            const retirementMonths = parseInt(document.getElementById('retirementAge').value);
+            const totalInterest = personalAccountBalance - totalPersonalContribution;
+            
+            // 使用最后一年的社会平均工资作为退休时上年度社平工资
+            const lastYear = currentYears[currentYears.length - 1];
+            const finalAvgSalaryInput = document.getElementById(`avgSalary_${lastYear}`);
+            const finalAvgSalary = parseFloat(finalAvgSalaryInput.value) || 0;
+            
+            // 检查退休时社平工资是否为0
+            if (finalAvgSalary <= 0) {
+                alert(`退休年份${lastYear}的社会平均工资不能为0，请填写正确的数值！`);
+                finalAvgSalaryInput.focus();
+                return;
+            }
+            
+            // 基础养老金
+            const indexedAvgSalary = finalAvgSalary * avgIndex;
+            const basicPension = (finalAvgSalary + indexedAvgSalary) / 2 * (totalMonths / 12) * 0.01;
+            
+            // 个人账户养老金
+            const personalPension = personalAccountBalance / retirementMonths;
+            
+            // 显示结果
+            document.getElementById('totalMonths').textContent = totalMonths;
+            document.getElementById('totalPersonalContribution').textContent = totalPersonalContribution.toFixed(2);
+            document.getElementById('finalBalance').textContent = personalAccountBalance.toFixed(2);
+            document.getElementById('totalInterest').textContent = totalInterest.toFixed(2);
+            document.getElementById('avgIndex').textContent = avgIndex.toFixed(4);
+            document.getElementById('basicPension').textContent = basicPension.toFixed(2);
+            document.getElementById('personalPension').textContent = personalPension.toFixed(2);
+            document.getElementById('totalPension').textContent = (basicPension + personalPension).toFixed(2);
+            
+            document.getElementById('result').style.display = 'block';
+        }
+        
+        // 初始添加一年数据
+        window.onload = function() {
+            // 检查是否有保存的数据
+            const savedData = localStorage.getItem('pensionCalculatorData');
+            if (savedData) {
+                if (confirm('检测到有保存的数据，是否加载？')) {
+                    const data = JSON.parse(savedData);
+                    restoreData(data);
+                } else {
+                    addYear();
+                }
+            } else {
+                addYear();
+            }
+        };
+    </script>
+</body>
+</html>
